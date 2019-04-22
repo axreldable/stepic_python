@@ -3,57 +3,40 @@
 # get <namespace> <var>
 
 
-main_dict = {
-    'global': {
-        'parent': None,
-        'vars': set('a'),
-        'foo': {
-            'parent': 'global',
-            'vars': set('b'),
-            'bar': {
-                'parent': 'foo',
-                'vars': set('a')}
-        }
-    }
-}
-
-dict1 = {
+namespaces = {
     'global': {
         'parent': None,
         'vars': set()
     }
 }
 
-cur_dict = dict1['global']
-
 
 def create(namespace, parent):
-    create_d(dict1, namespace, parent)
-
-
-def create_d(dic, namespace, parent):
-    if dic[parent][namespace] is None:
-        dic[parent][namespace] = {
-            'parent': parent,
-            'vars': set()
-        }
-    else:
-        for key in dic.keys():
-            create_d(dic[key], namespace, parent)
+    namespaces[namespace] = {
+        'parent': parent,
+        'vars': set()
+    }
 
 
 def add(namespace, var):
-    cur_dict[namespace]['vars'].add(var)
+    namespaces[namespace]['vars'].add(var)
 
 
-# def get(namespace, var):
-#     return cur_dict[name]
+def get(namespace, var):
+    if var in namespaces[namespace]['vars']:
+        return namespace
+    elif namespaces[namespace]['parent'] is None:
+        return None
+    else:
+        return get(namespaces[namespace]['parent'], var)
 
-print(cur_dict)
-create('foo', 'global')
-print(cur_dict)
-add('foo', 'a')
-print(cur_dict)
-create('bar', 'foo')
-print(cur_dict)
 
+n = int(input())
+for i in range(0, n):
+    command, namespace, var = input().split()
+    if command == 'create':
+        create(namespace, var)
+    elif command == 'add':
+        add(namespace, var)
+    else:
+        print(get(namespace, var))
